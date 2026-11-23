@@ -148,9 +148,6 @@ CREATE TABLE IF NOT EXISTS attendance_alerts(
  notification_id INTEGER PRIMARY KEY REFERENCES notifications,
  enrollment_id INTEGER NOT NULL REFERENCES enrollments,
  absent_rate REAL NOT NULL CHECK(absent_rate BETWEEN 0 AND 1));
-
--- Chỉ cho phép đúng 1 luật đang hoạt động.
--- Khi đổi luật: UPDATE luật cũ is_active=0 trước, rồi INSERT luật mới (trong cùng transaction).
 CREATE UNIQUE INDEX IF NOT EXISTS one_active_rule ON attendance_rules(is_active) WHERE is_active = 1;
 
 CREATE INDEX IF NOT EXISTS idx_enroll_student ON enrollments(student_id);
@@ -233,7 +230,6 @@ def init_app(app):
     with app.app_context():
         get_db().executescript(SCHEMA)
         _seed_defaults()
-
 
 def close_db(e=None):
     db = g.pop("db", None)
